@@ -1,29 +1,15 @@
 import * as path from "node:path";
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell } from "electron";
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage } from "electron";
 import { supabase, restoreSession, clearSession } from "./supabase";
 import store from "./store";
 import * as tracker from "./tracker";
 import * as tasks from "./tasks";
 import * as projects from "./projects";
 import { TRAY_ICON_BASE64 } from "./assets";
-import { getLogPath } from "./logger";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuiting = false;
-
-// Prevent launching a second copy (e.g. double-clicking the installer or
-// Start Menu shortcut while it's already running in the tray) — without
-// this, duplicate processes pile up and can fight over the same session.
-const gotSingleInstanceLock = app.requestSingleInstanceLock();
-if (!gotSingleInstanceLock) {
-  app.quit();
-} else {
-  app.on("second-instance", () => {
-    mainWindow?.show();
-    mainWindow?.focus();
-  });
-}
 
 function screenPath(name: string): string {
   return path.join(__dirname, "..", "renderer", name);
@@ -67,7 +53,6 @@ function createTray(): void {
   tray.setToolTip("Desk Tracker");
   const menu = Menu.buildFromTemplate([
     { label: "Open Desk Tracker", click: () => mainWindow?.show() },
-    { label: "View logs", click: () => shell.showItemInFolder(getLogPath()) },
     { type: "separator" },
     {
       label: "Quit",
