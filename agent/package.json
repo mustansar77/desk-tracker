@@ -1,0 +1,55 @@
+{
+  "name": "desk-tracker-agent",
+  "version": "1.0.0",
+  "description": "Desk Tracker desktop agent - time tracking with periodic screenshots",
+  "main": "dist/main/main.js",
+  "private": true,
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.js",
+    "start": "npm run build && electron .",
+    "dev": "npm run build && electron . --dev",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "electron-store": "^8.2.0",
+    "node-fetch": "^2.7.0",
+    "screenshot-desktop": "^1.15.0",
+    "sharp": "^0.33.5",
+    "uiohook-napi": "^1.5.5",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/ws": "^8.18.1",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.4"
+  },
+  "build": {
+    "appId": "com.desktracker.agent",
+    "productName": "Desk Tracker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

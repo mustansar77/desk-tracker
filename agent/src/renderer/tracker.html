@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Desk Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="card">
+    <div class="logo"></div>
+    <div class="user-row" id="user-row">...</div>
+    <div class="status-pill">
+      <span class="dot" id="status-dot"></span>
+      <span id="status-text">Stopped</span>
+    </div>
+    <div class="timer" id="timer">00:00:00</div>
+    <button id="toggle-btn">Start</button>
+    <div class="error" id="error"></div>
+
+    <div class="tasks-section" id="tasks-section" hidden>
+      <div class="tasks-heading">Today's tasks</div>
+      <div id="tasks-list"></div>
+    </div>
+
+    <button class="logout-link" id="logout-btn">Sign out</button>
+  </div>
+  <script src="tracker.js"></script>
+</body>
+</html>
