@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("api", {
   logout: () => ipcRenderer.invoke("auth:logout"),
   getSession: () => ipcRenderer.invoke("auth:get-session"),
 
-  startTimer: () => ipcRenderer.invoke("tracker:start"),
+  startTimer: (projectId: string | null) => ipcRenderer.invoke("tracker:start", projectId),
   stopTimer: () => ipcRenderer.invoke("tracker:stop"),
   getTimerStatus: () => ipcRenderer.invoke("tracker:status"),
 
@@ -16,4 +16,6 @@ contextBridge.exposeInMainWorld("api", {
   incrementTask: (taskId: string) => ipcRenderer.invoke("tasks:increment", taskId),
   submitTaskReport: (taskId: string, description: string) =>
     ipcRenderer.invoke("tasks:submit", taskId, description),
+
+  listProjects: () => ipcRenderer.invoke("projects:list"),
 });

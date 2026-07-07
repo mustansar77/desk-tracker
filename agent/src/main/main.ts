@@ -4,6 +4,7 @@ import { supabase, restoreSession, clearSession } from "./supabase";
 import store from "./store";
 import * as tracker from "./tracker";
 import * as tasks from "./tasks";
+import * as projects from "./projects";
 import { TRAY_ICON_BASE64 } from "./assets";
 
 let mainWindow: BrowserWindow | null = null;
@@ -139,10 +140,10 @@ ipcMain.handle("auth:logout", async () => {
   return true;
 });
 
-ipcMain.handle("tracker:start", async () => {
+ipcMain.handle("tracker:start", async (_event, projectId: string | null) => {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) throw new Error("Not logged in");
-  return tracker.startTracking(data.user.id);
+  return tracker.startTracking(data.user.id, projectId);
 });
 
 ipcMain.handle("tracker:stop", async () => tracker.stopTracking());
@@ -160,3 +161,5 @@ ipcMain.handle("tasks:increment", async (_event, taskId: string) => tasks.increm
 ipcMain.handle("tasks:submit", async (_event, taskId: string, description: string) =>
   tasks.submitTaskReport(taskId, description)
 );
+
+ipcMain.handle("projects:list", async () => projects.listMyProjects());

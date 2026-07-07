@@ -9,6 +9,7 @@ export interface ActiveEntry {
   id: string;
   userId: string;
   startTime: string;
+  projectId: string | null;
 }
 
 interface StoreSchema {

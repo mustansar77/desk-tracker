@@ -41,8 +41,26 @@ dashboard/   Web app you use to review time and screenshots
   app with a +1 button that only ever moves forward — once they hit the
   target, they write a short description and submit it, which you then see
   as a completed report in the dashboard.
+- **Projects & companies**: create client companies under Organizations, and
+  projects under either Organizations or Project tracking (optionally tied to
+  a company). Assign employees to a project, and they'll see a project picker
+  in the agent before hitting Start — sessions get tagged to that project, so
+  you can see time tracked per project as well as per person.
 - Row Level Security in Postgres enforces all of this server-side: employees
   can only ever read/write their own data; only admins can read everyone's.
+
+## Dashboard layout
+
+The dashboard now has five sections in the sidebar:
+- **Dashboard** — a live overview: team size, who's tracking right now, total
+  hours today, tasks completed today.
+- **Project tracking** — create projects, assign employees, see time tracked
+  per project.
+- **Organizations** — your client companies; each one shows its projects.
+- **Employees** — the original per-person view: sessions, tasks, screenshots
+  (click any session row to open its screenshots).
+- **Settings** — currently a minimal placeholder; tell me what system-wide
+  settings you want and I'll build them out.
 
 ## Nothing here is fake
 

@@ -9,11 +9,12 @@ export interface TrackerStatus {
   running: boolean;
   entryId?: string;
   startTime?: string;
+  projectId?: string | null;
 }
 
 export function getStatus(): TrackerStatus {
   return active
-    ? { running: true, entryId: active.id, startTime: active.startTime }
+    ? { running: true, entryId: active.id, startTime: active.startTime, projectId: active.projectId }
     : { running: false };
 }
 
@@ -30,13 +31,16 @@ export function resumeIfActive(): TrackerStatus {
   return getStatus();
 }
 
-export async function startTracking(userId: string): Promise<TrackerStatus> {
+export async function startTracking(
+  userId: string,
+  projectId: string | null = null
+): Promise<TrackerStatus> {
   if (active) return getStatus();
 
   const startTime = new Date().toISOString();
   const { data, error } = await supabase
     .from("time_entries")
-    .insert({ user_id: userId, start_time: startTime })
+    .insert({ user_id: userId, start_time: startTime, project_id: projectId })
     .select()
     .single();
 
@@ -44,7 +48,7 @@ export async function startTracking(userId: string): Promise<TrackerStatus> {
     throw new Error(error?.message ?? "Failed to start tracking");
   }
 
-  active = { id: data.id, userId, startTime };
+  active = { id: data.id, userId, startTime, projectId };
   store.set("activeEntry", active);
   activityTracker.start();
   startScheduler(userId, data.id);

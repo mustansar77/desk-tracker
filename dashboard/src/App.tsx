@@ -1,7 +1,7 @@
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Shell from "./pages/Shell";
 
 function Gate() {
   const { session, profile, loading, signOut } = useAuth();
@@ -35,7 +35,7 @@ function Gate() {
     );
   }
 
-  return <Dashboard />;
+  return <Shell />;
 }
 
 export default function App() {

@@ -36,3 +36,11 @@ the tray icon's Quit option, or Stop the timer first).
 While a timer is running, the app waits a random delay between 3 and 5
 minutes, takes one screenshot, uploads it, and repeats — so captures land at
 unpredictable points instead of a perfectly fixed 5-minute beat.
+
+## Project picker
+
+If the admin has assigned the signed-in employee to one or more projects (see
+the dashboard's Project tracking / Organizations tabs), a **Project**
+dropdown appears above the Start button. Picking one before hitting Start
+tags that session to the project; leaving it on "No project" behaves exactly
+like before. The dropdown is disabled while a session is running.

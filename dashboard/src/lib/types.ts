@@ -14,6 +14,7 @@ export interface TimeEntry {
   end_time: string | null;
   duration_seconds: number | null;
   created_at: string;
+  project_id: string | null;
 }
 
 export interface Screenshot {
@@ -41,4 +42,25 @@ export interface Task {
   task_date: string;
   completed_at: string | null;
   created_at: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface Project {
+  id: string;
+  organization_id: string | null;
+  name: string;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface ProjectMember {
+  project_id: string;
+  user_id: string;
+  added_at: string;
 }

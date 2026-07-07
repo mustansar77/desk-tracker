@@ -15,6 +15,7 @@ interface TimerStatus {
   running: boolean;
   entryId?: string;
   startTime?: string;
+  projectId?: string | null;
 }
 
 interface DeskTrackerApi {
@@ -23,12 +24,13 @@ interface DeskTrackerApi {
   login: (email: string, password: string) => Promise<LoginResult>;
   logout: () => Promise<boolean>;
   getSession: () => Promise<SessionResult>;
-  startTimer: () => Promise<TimerStatus>;
+  startTimer: (projectId: string | null) => Promise<TimerStatus>;
   stopTimer: () => Promise<TimerStatus>;
   getTimerStatus: () => Promise<TimerStatus>;
   listTasks: () => Promise<Task[]>;
   incrementTask: (taskId: string) => Promise<Task>;
   submitTaskReport: (taskId: string, description: string) => Promise<Task>;
+  listProjects: () => Promise<ProjectOption[]>;
 }
 
 declare global {
@@ -46,5 +48,10 @@ declare global {
     description: string | null;
     task_date: string;
     completed_at: string | null;
+  }
+
+  interface ProjectOption {
+    id: string;
+    name: string;
   }
 }

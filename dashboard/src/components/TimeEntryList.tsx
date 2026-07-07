@@ -1,6 +1,6 @@
 import type { TimeEntry } from "../lib/types";
 import { formatDuration, formatTime } from "../lib/format";
-import { ClockIcon, ImageIcon } from "./icons";
+import { ChevronRightIcon, ClockIcon } from "./icons";
 
 interface Props {
   entries: TimeEntry[];
@@ -15,7 +15,7 @@ function liveDurationSeconds(entry: TimeEntry): number {
 export default function TimeEntryList({ entries, onViewScreenshots }: Props) {
   if (entries.length === 0) {
     return (
-      <div className="mt-6 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-12 flex flex-col items-center text-center">
+      <div className="mt-3 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-12 flex flex-col items-center text-center">
         <ClockIcon className="w-6 h-6 text-slate-300 dark:text-slate-700 mb-2" />
         <p className="text-sm text-slate-400 dark:text-slate-500">No time entries for this day.</p>
       </div>
@@ -23,13 +23,15 @@ export default function TimeEntryList({ entries, onViewScreenshots }: Props) {
   }
 
   return (
-    <div className="mt-6 space-y-2">
+    <div className="mt-3 space-y-2">
       {entries.map((entry) => {
         const running = !entry.end_time;
         return (
-          <div
+          <button
             key={entry.id}
-            className="flex items-center justify-between px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+            onClick={() => onViewScreenshots(entry.id)}
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-200 dark:hover:border-indigo-500/40 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/5 transition-colors text-left"
+            title="View screenshots for this session"
           >
             <div className="flex items-center gap-3.5">
               <div
@@ -59,14 +61,8 @@ export default function TimeEntryList({ entries, onViewScreenshots }: Props) {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => onViewScreenshots(entry.id)}
-              className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-500/40 rounded-lg px-2.5 py-1.5 transition-colors"
-            >
-              <ImageIcon className="w-3.5 h-3.5" />
-              Screenshots
-            </button>
-          </div>
+            <ChevronRightIcon className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" />
+          </button>
         );
       })}
     </div>

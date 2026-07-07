@@ -8,6 +8,8 @@
   const logoutBtn = document.getElementById("logout-btn") as HTMLButtonElement;
   const tasksSection = document.getElementById("tasks-section") as HTMLDivElement;
   const tasksList = document.getElementById("tasks-list") as HTMLDivElement;
+  const projectField = document.getElementById("project-field") as HTMLDivElement;
+  const projectSelect = document.getElementById("project-select") as HTMLSelectElement;
 
   let running = false;
   let startTime: number | null = null;
@@ -29,6 +31,7 @@
     statusText.textContent = isRunning ? "Tracking" : "Stopped";
     toggleBtn.textContent = isRunning ? "Stop" : "Start";
     toggleBtn.classList.toggle("danger", isRunning);
+    projectSelect.disabled = isRunning;
 
     if (tickHandle) {
       clearInterval(tickHandle);
@@ -165,6 +168,24 @@
     }
   }
 
+  async function loadProjects(): Promise<void> {
+    try {
+      const list = await window.api.listProjects();
+      projectField.hidden = list.length === 0;
+      while (projectSelect.options.length > 1) {
+        projectSelect.remove(1);
+      }
+      for (const project of list) {
+        const option = document.createElement("option");
+        option.value = project.id;
+        option.textContent = project.name;
+        projectSelect.appendChild(option);
+      }
+    } catch {
+      // Non-fatal: project tagging is optional, don't block the tracker UI.
+    }
+  }
+
   async function init(): Promise<void> {
     const session = await window.api.getSession();
     if (!session.loggedIn || !session.user) {
@@ -173,8 +194,11 @@
     }
     userRow.textContent = session.user.fullName;
 
+    await loadProjects();
+
     const status = await window.api.getTimerStatus();
     startTime = status.startTime ? new Date(status.startTime).getTime() : null;
+    if (status.projectId) projectSelect.value = status.projectId;
     renderRunning(status.running);
 
     await loadTasks();
@@ -190,7 +214,7 @@
         startTime = null;
         renderRunning(false);
       } else {
-        const status = await window.api.startTimer();
+        const status = await window.api.startTimer(projectSelect.value || null);
         startTime = status.startTime ? new Date(status.startTime).getTime() : Date.now();
         renderRunning(true);
       }

@@ -79,6 +79,46 @@ create index if not exists time_entries_user_start_idx
   on public.time_entries (user_id, start_time desc);
 
 -- ---------------------------------------------------------------------------
+-- organizations: client companies your team does work for (grouping/tagging
+-- only — everything is still managed by the one admin, not separate tenants)
+-- ---------------------------------------------------------------------------
+create table if not exists public.organizations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  created_by uuid references public.profiles (id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
+-- ---------------------------------------------------------------------------
+-- projects: optionally grouped under an organization, assigned to employees
+-- via project_members. Time entries can optionally be tagged to a project.
+-- ---------------------------------------------------------------------------
+create table if not exists public.projects (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid references public.organizations (id) on delete set null,
+  name text not null,
+  created_by uuid references public.profiles (id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.project_members (
+  project_id uuid not null references public.projects (id) on delete cascade,
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  added_at timestamptz not null default now(),
+  primary key (project_id, user_id)
+);
+
+alter table public.time_entries
+  add column if not exists project_id uuid references public.projects (id) on delete set null;
+
+create index if not exists projects_organization_idx
+  on public.projects (organization_id);
+create index if not exists project_members_user_idx
+  on public.project_members (user_id);
+create index if not exists time_entries_project_idx
+  on public.time_entries (project_id);
+
+-- ---------------------------------------------------------------------------
 -- screenshots: one row per captured screenshot
 -- ---------------------------------------------------------------------------
 create table if not exists public.screenshots (
@@ -194,6 +234,9 @@ alter table public.profiles enable row level security;
 alter table public.time_entries enable row level security;
 alter table public.screenshots enable row level security;
 alter table public.tasks enable row level security;
+alter table public.organizations enable row level security;
+alter table public.projects enable row level security;
+alter table public.project_members enable row level security;
 
 -- profiles
 drop policy if exists "profiles_select_own_or_admin" on public.profiles;
@@ -255,6 +298,57 @@ create policy "tasks_update_own_or_admin"
 drop policy if exists "tasks_delete_admin_only" on public.tasks;
 create policy "tasks_delete_admin_only"
   on public.tasks for delete
+  using (public.is_admin());
+
+-- organizations: admin only (employees don't need to see the client list)
+drop policy if exists "organizations_admin_all" on public.organizations;
+create policy "organizations_admin_all"
+  on public.organizations for all
+  using (public.is_admin())
+  with check (public.is_admin());
+
+-- projects: admin full access; employees can see projects they're a member of
+drop policy if exists "projects_select_admin_or_member" on public.projects;
+create policy "projects_select_admin_or_member"
+  on public.projects for select
+  using (
+    public.is_admin()
+    or exists (
+      select 1 from public.project_members pm
+      where pm.project_id = projects.id and pm.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "projects_insert_admin" on public.projects;
+create policy "projects_insert_admin"
+  on public.projects for insert
+  with check (public.is_admin());
+
+drop policy if exists "projects_update_admin" on public.projects;
+create policy "projects_update_admin"
+  on public.projects for update
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "projects_delete_admin" on public.projects;
+create policy "projects_delete_admin"
+  on public.projects for delete
+  using (public.is_admin());
+
+-- project_members: admin full access; employees can see their own memberships
+drop policy if exists "project_members_select_admin_or_own" on public.project_members;
+create policy "project_members_select_admin_or_own"
+  on public.project_members for select
+  using (public.is_admin() or user_id = auth.uid());
+
+drop policy if exists "project_members_insert_admin" on public.project_members;
+create policy "project_members_insert_admin"
+  on public.project_members for insert
+  with check (public.is_admin());
+
+drop policy if exists "project_members_delete_admin" on public.project_members;
+create policy "project_members_delete_admin"
+  on public.project_members for delete
   using (public.is_admin());
 
 -- ---------------------------------------------------------------------------
