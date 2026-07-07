@@ -1,6 +1,6 @@
 {
   "name": "desk-tracker-agent",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Desk Tracker desktop agent - time tracking with periodic screenshots",
   "main": "dist/main/main.js",
   "private": true,
@@ -52,7 +52,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh"
     },
     "mac": {
       "target": ["dmg"],
