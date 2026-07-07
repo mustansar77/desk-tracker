@@ -2,6 +2,7 @@ import screenshot from "screenshot-desktop";
 import sharp from "sharp";
 import { supabase } from "./supabase";
 import { getStatsAndReset } from "./activityTracker";
+import { logError } from "./logger";
 
 let timer: ReturnType<typeof setTimeout> | null = null;
 let stopped = true;
@@ -18,7 +19,6 @@ async function captureAndUpload(userId: string, timeEntryId: string): Promise<vo
   // Read now, before the capture/upload takes a moment, so the activity
   // level reflects the interval that just elapsed.
   const activity = getStatsAndReset();
-  console.log("[screenshotScheduler] activity for this interval:", activity);
   try {
     const imgBuffer = await screenshot({ format: "png" });
     const jpeg = await sharp(imgBuffer)
@@ -45,9 +45,8 @@ async function captureAndUpload(userId: string, timeEntryId: string): Promise<vo
     });
     if (insertError) throw insertError;
 
-    console.log(`[screenshotScheduler] captured + uploaded ${storagePath}`);
   } catch (err) {
-    console.error("[screenshotScheduler] capture/upload failed:", err);
+    logError("screenshotScheduler.captureAndUpload", err);
   }
 }
 
